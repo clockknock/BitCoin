@@ -15,6 +15,10 @@
         #result {
             padding: 15px;
         }
+
+        label {
+            margin-bottom: 12px;
+        }
     </style>
 
 
@@ -31,15 +35,37 @@
             var content = $("#inputContent").val();
             loading.baosight.showPageLoadingMsg(false);// 显示进度条
             $.post("/addGenesis", {genesis: content}, function (data) {
-                $("#result").html(data)
-                loading.baosight.hidePageLoadingMsg() // 隐藏进度条
+                $("#result").html(data);
+                loading.baosight.hidePageLoadingMsg(); // 隐藏进度条
+                showList();
             });
         }
 
         function addNote() {
+            var senderPublicKey = $("#senderPublicKey").val();
+            var senderPrivateKey = $("#senderPrivateKey").val();
+            var receiverPublicKey = $("#receiverPublicKey").val();
             var note = $("#inputContent").val();
+            // 生成私钥
+            var prvKey = KEYUTIL.getKey(senderPrivateKey);
+            // 指定生成签名使用的算法
+            var sig = new KJUR.crypto.Signature({"alg": "SHA256withRSA"});
+            // 初始化私钥
+            sig.init(prvKey);
+            // 传入原文
+            sig.updateString(note);
+            // 生成签名数据
+            var sigValueHex = sig.sign();
+
+
+
             loading.baosight.showPageLoadingMsg(false);// 显示进度条
-            $.post("/addNote", {note: note}, function (data) {
+            $.post("/addTransaction", {
+                senderPublicKey:senderPublicKey,
+                receiverPublicKey:receiverPublicKey,
+                signature:sigValueHex,
+                content: note
+            }, function (data) {
                 $("#result").html(data);
                 loading.baosight.hidePageLoadingMsg();// 隐藏进度条
                 showList();
@@ -53,7 +79,7 @@
                 $("#tbody").html("");
                 $.each(data, function (i, n) {
                     $("#tbody").append("<tr><th scope=\"row\">" + n.id + "</th><td>" + n.content
-                        + "</td><td>" + n.hash + "</td><td>" + n.preHash + "</td><td>"  + n.nonce +
+                        + "</td><td>" + n.hash + "</td><td>" + n.preHash + "</td><td>" + n.nonce +
                         "</td></tr>");
                 });
                 loading.baosight.hidePageLoadingMsg();// 隐藏进度条
@@ -72,6 +98,43 @@
     </script>
 </head>
 <body>
+<div class="row">
+    <div class="col-xs-12">
+        <label>
+            发送方的私钥
+        </label>
+        <textarea class="form-control" id="senderPrivateKey">-----BEGIN PRIVATE KEY-----
+MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAJQBK2l53XLd6ltUknIhZHDsk5NT
+Xm3HZtoFs5zbHkRxb0Jx6ZvCVQjULmqoPb29whO+dCOd9069oICQuSzxU7mth1j7MbFr4u7rxb9k
+32STjymzbLJTIzw1MHQobfnu0gdbwYxOkoDbGeP7wwkVaSmiZXxL/R6tW2A2+5/RmrGdAgMBAAEC
+gYBzHc3ERlMl6tFDpC4bszlKU9gc+PUzcarf3Rts30lVdt1Q0wUebzJwoYhQ0Pbkw9lWPgZbRZx7
+lCZomShOeo3hYhlHPNdUeuWpkMmcBTlqZ2NpbElDzYjLN9tDiWoX725CMdUcL3vxJw1ZkKn2FYuL
+de76FYePnrXm4MEG1dYCgQJBAPDFP35U2Cvgxvkd9G6dOml4imBnZBHF6okGkLzJsZbvJ9FcLErG
+gRsnWDSSW4QYtoKbDIpeIb6ZVlZ2GbkWNk0CQQCdXceyNI8m3eI1MXn9iIwXt9wqE5ksCZNb9QnB
+nPGFv2iVx5vLtWqJQ3haLmyfmWL5uwdIW4jWvo4lya079bCRAkANhQXrshfxXs3Nb0EqdOmywnIC
+t8uGs/ZXe2blMu4l64fw2ZwjFsJpI+xwB0fcQwb8jnhFzMNYUIPolvkay4SBAkEAi3VThvMbNeeH
+E3rwUCYVeOOAom1R3fvycpj6d3G9fLj/V1VZFTOF4XVAkDL6IopNc2Ey+AXeg+jFkmljM3LtcQJA
+D3z9RnNE2mxTFTZeCLkFS+vIlZhMCxZ0T7k+2Xz1PeVyY1ISlwFOXBLDCdPVpfUygD2VhK/2MuN+
+Fz4xR+q19A==
+-----END PRIVATE KEY-----</textarea>
+        <label>
+            发送方的公钥
+        </label>
+        <textarea class="form-control" id="senderPublicKey">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCUAStped1y3epbVJJyIWRw7JOTU15tx2baBbOc
+2x5EcW9CcembwlUI1C5qqD29vcITvnQjnfdOvaCAkLks8VO5rYdY+zGxa+Lu68W/ZN9kk48ps2yy
+UyM8NTB0KG357tIHW8GMTpKA2xnj+8MJFWkpomV8S/0erVtgNvuf0ZqxnQIDAQAB</textarea><label>
+        接收方的公钥
+    </label>
+        <textarea class="form-control" id="receiverPublicKey">MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCWFOrEng+eQuZu3ZmZ1OeKEaG2ST1a73PX8GI4
+N8a+pm3zNPO+Lz/HtN77nwcXr1wZdZXvjF18AGwPO4zHvbGYXmOdQH7TLEATfRLBxcuh+Jod26KY
+vEtkR1gsAxqdBkMvm/QnTKypixyTrn3X8tdH4KK+a1P1dhBvDRGRXeVHowIDAQAB</textarea>
+        <label>
+            转账信息
+        </label>
+
+    </div>
+
+</div>
 
 <!--输入框-->
 <input type="text" class="form-control" id="inputContent" placeholder="请输入内容" style="width: 600px">

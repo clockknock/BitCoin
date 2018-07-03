@@ -1,11 +1,14 @@
 package pri.zhong.bitcoin;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pri.zhong.bitcoin.bean.Block;
 import pri.zhong.bitcoin.bean.NoteBook;
+import pri.zhong.bitcoin.bean.Transaction;
 
 import java.util.ArrayList;
 
@@ -26,7 +29,6 @@ public class BitCoinController {
     public String addGenesis(String genesis) {
         try {
             noteBook.addGenesis(genesis);
-
         } catch (Exception e) {
             e.printStackTrace();
             return "添加失败";
@@ -34,6 +36,19 @@ public class BitCoinController {
         return "添加成功";
     }
 
+    @PostMapping("/addTransaction")
+    public String addTransaction(Transaction transaction) {
+        try {
+            if (transaction.verify()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                String transactionString = objectMapper.writeValueAsString(transaction);
+                noteBook.addNote(transactionString);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return "添加成功";
+    }
 
     @PostMapping("/addNote")
     public String addNote(String note) {
@@ -60,7 +75,7 @@ public class BitCoinController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(StringUtils.isEmpty(result)){
+        if (StringUtils.isEmpty(result)) {
             return "没有问题";
         }
         return result;

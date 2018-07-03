@@ -20,7 +20,7 @@ public class Transaction {
 
     public boolean verify() {
         PublicKey senderPk = RSAUtils.getPublicKeyFromString("RSA", senderPublicKey);
-        return RSAUtils.verify("SHA256withRSA", senderPk, content, signature);
+        return RSAUtils.verifyDataJS("SHA256withRSA", senderPk, content, signature);
     }
 
     public String getSenderPublicKey() {
@@ -53,6 +53,16 @@ public class Transaction {
 
     public void setSignature(String signature) {
         this.signature = signature;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "senderPublicKey='" + senderPublicKey + '\'' +
+                ", receiverPublicKey='" + receiverPublicKey + '\'' +
+                ", content='" + content + '\'' +
+                ", signature='" + signature + '\'' +
+                '}';
     }
 
     public Transaction(String senderPublicKey, String receiverPublicKey, String content, String signature) {

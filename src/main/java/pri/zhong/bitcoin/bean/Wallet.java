@@ -26,7 +26,7 @@ public class Wallet {
         //判断公私钥文件是否存在,不存在则创建
         if (!pubFile.exists() || pubFile.length() == 0 ||
                 !priFile.exists() || priFile.length() == 0) {
-            RSAUtils.generateKeys("RSA", priFile.getPath(), pubFile.getPath());
+            RSAUtils.generateKeysJS("RSA", priFile.getPath(), pubFile.getPath());
         }
 
         //读取文件获得公私钥
@@ -43,4 +43,6 @@ public class Wallet {
         //生成交易对象
         return new Transaction(publicKeyString,receiverPublicKey,content,signature);
     }
+
+
 }

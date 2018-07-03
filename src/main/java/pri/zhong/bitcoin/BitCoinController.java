@@ -1,7 +1,9 @@
 package pri.zhong.bitcoin;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pri.zhong.bitcoin.bean.Block;
+import pri.zhong.bitcoin.bean.NoteBook;
 
 import java.util.ArrayList;
 
@@ -12,14 +14,40 @@ import java.util.ArrayList;
 @RestController
 public class BitCoinController {
 
-    public static void main(String[] args) {
-        Block block = new Block();
-        block.addGenesis("这是创世");
-        block.addNote("信息");
-        ArrayList<String> strings = block.showList();
-        for (String string : strings) {
-            System.out.println(string);
-        }
+    private static NoteBook noteBook;
+    static{
+        noteBook =new NoteBook();
     }
+
+    @PostMapping("addGenesis")
+    public String addGenesis(String genesis){
+        try {
+            noteBook.addGenesis(genesis);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "添加失败";
+        }
+        return "添加成功";
+    }
+
+
+    @PostMapping("/addNote")
+    public String addNote(String note){
+        try {
+            noteBook.addNote(note);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "添加失败";
+        }
+        return "添加成功";
+    }
+
+    @GetMapping("/showList")
+    public ArrayList<String> addNote(){
+        return noteBook.showList();
+    }
+
+
 
 }

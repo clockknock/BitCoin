@@ -11,11 +11,11 @@ import java.util.ArrayList;
  * @author 钟未鸣
  * @date 2018/7/3
  */
-public class Block {
+public class NoteBook {
     private ArrayList<String> nodes;
     private File jsonFile = new File("a.json");
 
-    public Block() {
+    public NoteBook() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             CollectionLikeType nodesType = objectMapper.getTypeFactory().constructCollectionLikeType(ArrayList.class, String.class);
@@ -54,7 +54,7 @@ public class Block {
 
     }
 
-    public void save2Disk() {
+    private void save2Disk() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(jsonFile, nodes);

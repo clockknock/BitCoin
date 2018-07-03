@@ -10,6 +10,23 @@ public class Block {
     private String content;
     private String hash;
     private int nonce;
+    private String preHash;
+
+    public String getPreHash() {
+        return preHash;
+    }
+
+    public void setPreHash(String preHash) {
+        this.preHash = preHash;
+    }
+
+    public Block(int id, String content, String hash, int nonce, String preHash) {
+        this.id = id;
+        this.content = content;
+        this.hash = hash;
+        this.nonce = nonce;
+        this.preHash = preHash;
+    }
 
     public int getNonce() {
         return nonce;
@@ -48,10 +65,5 @@ public class Block {
     public Block() {
     }
 
-    public Block(int id, String content, String hash, int nonce) {
-        this.id = id;
-        this.content = content;
-        this.hash = hash;
-        this.nonce = nonce;
-    }
+
 }

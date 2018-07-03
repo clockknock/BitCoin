@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class NoteBook {
     private ArrayList<Block> nodes = new ArrayList<>();
-    ;
+    
     private File jsonFile = new File("a.json");
 
     public NoteBook() {
@@ -32,12 +32,32 @@ public class NoteBook {
 
     public void addGenesis(String genesis) {
         if (nodes.size() == 0) {
-            String hash = HashUtils.sha256(genesis);
-            int nonce = mine(genesis + hash);
-            Block block = new Block(1, genesis, HashUtils.sha256(nonce + genesis + hash), nonce);
+            String preHash = "0000000000000000000000000000000000000000000000000000000000000000";
+            int nonce = mine(genesis + preHash);
+            Block block = new Block(0, genesis, HashUtils.sha256(nonce + genesis + preHash), nonce,
+                    preHash);
             nodes.add(block);
         } else {
             throw new RuntimeException("已有其他节点,不能添加创世区块");
+        }
+        save2Disk();
+    }
+
+    public void addNote(String note) {
+        int nodesSize = nodes.size();
+        if (nodesSize > 0) {
+            Block preBlock = nodes.get(nodesSize - 1);
+            String preBlockHash = preBlock.getHash();
+            int nonce = mine(note + preBlockHash);
+            Block block = new Block(
+                    nodesSize,
+                    note,
+                    HashUtils.sha256(nonce + note + preBlockHash),
+                    nonce,
+                    preBlockHash);
+            nodes.add(block);
+        } else {
+            throw new RuntimeException("未有创世区块,不能添加节点");
         }
         save2Disk();
     }
@@ -52,26 +72,8 @@ public class NoteBook {
         throw new RuntimeException("挖矿失败了,换个数据再来吧");
     }
 
-    public void addNote(String note) {
-        if (nodes.size() > 0) {
-
-            String hash = HashUtils.sha256(note);
-            int nonce = mine(note + hash);
-            Block block = new Block(
-                    nodes.size() + 1,
-                    note,
-                    HashUtils.sha256(nonce + note + hash),
-                    nonce);
-            nodes.add(block);
-        } else {
-            throw new RuntimeException("未有创世区块,不能添加节点");
-        }
-        save2Disk();
-    }
-
     public ArrayList<Block> showList() {
         return nodes;
-
     }
 
     private void save2Disk() {
@@ -85,14 +87,28 @@ public class NoteBook {
 
     public String check() {
         StringBuilder sb = new StringBuilder();
-        for (Block node : nodes) {
-            String calculatedHash = HashUtils.sha256(node.getContent());
-            if (!calculatedHash.equals(node.getHash())) {
-                sb.append("节点:").append(node.getId()).append("可能有问题了<br/>");
+
+        for (int i = 0; i < nodes.size(); i++) {
+            Block block = nodes.get(i);
+            int id = block.getId();
+            int nonce = block.getNonce();
+            String content = block.getContent();
+            String hash = block.getHash();
+            String preHash = block.getPreHash();
+            String currentHash = HashUtils.sha256(nonce + content + preHash);
+            //统一验证每一个区块的hash
+            if (!currentHash.equals(hash)) {
+                sb.append("id为:").append(id).append("的区块的hash值有问题<br/>");
+            }
+            //验证除了创世区块外,别的区块的preHash
+            if (i != 0) {
+                String preBlockHash = nodes.get(i - 1).getHash();
+                if(!preBlockHash.equals(preHash)){
+                sb.append("id为:").append(id).append("的区块的preHash值有问题<br/>");
+                }
             }
         }
         return sb.toString();
-
     }
 
 }

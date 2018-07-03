@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class NoteBook {
     private ArrayList<Block> nodes = new ArrayList<>();
-    
+
     private File jsonFile = new File("a.json");
 
     public NoteBook() {

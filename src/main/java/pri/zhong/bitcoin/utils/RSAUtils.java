@@ -123,7 +123,7 @@ public class RSAUtils {
      * @param privateKeyPath :  文件路径
      * @return : 私钥
      */
-    public static PrivateKey getPrivateKey(String algorithm, String privateKeyPath) {
+    public static PrivateKey getPrivateKeyFromFile(String algorithm, String privateKeyPath) {
 
         try {
             // 读取文件内容

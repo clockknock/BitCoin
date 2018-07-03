@@ -1,8 +1,10 @@
 package pri.zhong.bitcoin;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pri.zhong.bitcoin.bean.Block;
 import pri.zhong.bitcoin.bean.NoteBook;
 
 import java.util.ArrayList;
@@ -15,12 +17,13 @@ import java.util.ArrayList;
 public class BitCoinController {
 
     private static NoteBook noteBook;
-    static{
-        noteBook =new NoteBook();
+
+    static {
+        noteBook = new NoteBook();
     }
 
     @PostMapping("addGenesis")
-    public String addGenesis(String genesis){
+    public String addGenesis(String genesis) {
         try {
             noteBook.addGenesis(genesis);
 
@@ -33,7 +36,7 @@ public class BitCoinController {
 
 
     @PostMapping("/addNote")
-    public String addNote(String note){
+    public String addNote(String note) {
         try {
             noteBook.addNote(note);
         } catch (Exception e) {
@@ -44,10 +47,24 @@ public class BitCoinController {
     }
 
     @GetMapping("/showList")
-    public ArrayList<String> addNote(){
+    public ArrayList<Block> addNote() {
         return noteBook.showList();
     }
 
+
+    @GetMapping("/check")
+    public String check() {
+        String result = noteBook.check();
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(StringUtils.isEmpty(result)){
+            return "没有问题";
+        }
+        return result;
+    }
 
 
 }

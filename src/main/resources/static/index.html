@@ -23,26 +23,49 @@
     <script src="js/pb.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/jsrsasign-all-min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
+        $(function () {
+            showList();
+        });
+
         function addGenesis() {
             var content = $("#inputContent").val();
-            $.post("/addGenesis",{genesis:content},function(data){
+            loading.baosight.showPageLoadingMsg(false);// 显示进度条
+            $.post("/addGenesis", {genesis: content}, function (data) {
                 $("#result").html(data)
-            })
+                loading.baosight.hidePageLoadingMsg() // 隐藏进度条
+            });
         }
 
         function addNote() {
             var note = $("#inputContent").val();
-            $.post("/addNote",{note:note},function(data){
-                $("#result").html(data)
-            })
+            loading.baosight.showPageLoadingMsg(false);// 显示进度条
+            $.post("/addNote", {note: note}, function (data) {
+                $("#result").html(data);
+                loading.baosight.hidePageLoadingMsg();// 隐藏进度条
+                showList();
+            });
         }
-        function showList() {
-            $.get("/showList",function(data){
-                $.each(data,function(i,n){
 
-                })
+        function showList() {
+            $.get("/showList", function (data) {
+                //先清空再添加
+                loading.baosight.showPageLoadingMsg(false); // 显示进度条
+                $("#tbody").html("");
+                $.each(data, function (i, n) {
+                    $("#tbody").append("<tr><th scope=\"row\">" + n.id + "</th><td>" + n.content + "</td><td>Otto</td><td>" + n.hash + "</td></tr>");
+                });
+                loading.baosight.hidePageLoadingMsg();// 隐藏进度条
             })
         }
+
+        function check() {
+            loading.baosight.showPageLoadingMsg(false);// 显示进度条
+            $.get("/check", function (data) {
+                $("#result").html(data);
+                loading.baosight.hidePageLoadingMsg() // 隐藏进度条
+            })
+        }
+
 
     </script>
 </head>
@@ -56,6 +79,7 @@
     <button type="button" class="btn btn-default" onclick="addGenesis()">添加封面</button>
     <button type="button" class="btn btn-default" onclick="addNote()">添加记录</button>
     <button type="button" class="btn btn-default" onclick="showList()">展示数据</button>
+    <button type="button" class="btn btn-default" onclick="check()">校验数据</button>
 </div>
 <br>
 <!--用于展示结果-->
@@ -63,6 +87,20 @@
 
 </p>
 
+<table class="table">
+    <caption>Optional table caption.</caption>
+    <thead>
+    <tr>
+        <th>id</th>
+        <th>content</th>
+        <th>hash</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+
+
+    </tbody>
+</table>
 
 </body>
 </html>

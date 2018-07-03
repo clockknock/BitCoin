@@ -33,7 +33,8 @@ public class NoteBook {
     public void addGenesis(String genesis) {
         if (nodes.size() == 0) {
             String hash = HashUtils.sha256(genesis);
-            Block block = new Block(1, genesis, hash);
+            int nonce = mine(genesis + hash);
+            Block block = new Block(1, genesis, HashUtils.sha256(nonce + genesis + hash), nonce);
             nodes.add(block);
         } else {
             throw new RuntimeException("已有其他节点,不能添加创世区块");
@@ -41,11 +42,26 @@ public class NoteBook {
         save2Disk();
     }
 
+    private int mine(String msg) {
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            String sha256 = HashUtils.sha256(i + msg);
+            if (sha256.startsWith("0000")) {
+                return i;
+            }
+        }
+        throw new RuntimeException("挖矿失败了,换个数据再来吧");
+    }
+
     public void addNote(String note) {
         if (nodes.size() > 0) {
 
             String hash = HashUtils.sha256(note);
-            Block block = new Block(nodes.size() + 1, note, hash);
+            int nonce = mine(note + hash);
+            Block block = new Block(
+                    nodes.size() + 1,
+                    note,
+                    HashUtils.sha256(nonce + note + hash),
+                    nonce);
             nodes.add(block);
         } else {
             throw new RuntimeException("未有创世区块,不能添加节点");

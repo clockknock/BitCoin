@@ -9,6 +9,15 @@ public class Block {
     private int id;
     private String content;
     private String hash;
+    private int nonce;
+
+    public int getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(int nonce) {
+        this.nonce = nonce;
+    }
 
     public int getId() {
         return id;
@@ -39,9 +48,10 @@ public class Block {
     public Block() {
     }
 
-    public Block(int id, String content, String hash) {
+    public Block(int id, String content, String hash, int nonce) {
         this.id = id;
         this.content = content;
         this.hash = hash;
+        this.nonce = nonce;
     }
 }

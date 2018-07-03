@@ -52,7 +52,8 @@
                 loading.baosight.showPageLoadingMsg(false); // 显示进度条
                 $("#tbody").html("");
                 $.each(data, function (i, n) {
-                    $("#tbody").append("<tr><th scope=\"row\">" + n.id + "</th><td>" + n.content + "</td><td>Otto</td><td>" + n.hash + "</td></tr>");
+                    $("#tbody").append("<tr><th scope=\"row\">" + n.id + "</th><td>" + n.content
+                        + "</td><td>" + n.hash + "</td><td>" + n.nonce + "</td></tr>");
                 });
                 loading.baosight.hidePageLoadingMsg();// 隐藏进度条
             })
@@ -94,6 +95,7 @@
         <th>id</th>
         <th>content</th>
         <th>hash</th>
+        <th>nonce</th>
     </tr>
     </thead>
     <tbody id="tbody">
